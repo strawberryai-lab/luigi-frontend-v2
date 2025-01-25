@@ -72,7 +72,7 @@ export default async function Home() {
   });
 
   // Calculate total thoughts by summing up the thoughts array length from each job
-  const totalThoughts = allJobs.reduce((sum, job) => {
+  const totalThoughts = allJobs.reduce((sum: number, job) => {
     return sum + (job.result?.thoughts?.length || 0);
   }, 0);
 

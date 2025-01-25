@@ -41,6 +41,7 @@ const ppmori = localFont({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://luigi.usestrawberry.ai"),
   title: "Strawberry AI - 0xLuigi",
   description: "Crypto never sleeps, Neither does AI.",
 };

@@ -1,6 +1,6 @@
-import { MDXRemote } from "@mintlify/mdx"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { MDXRemote } from "@mintlify/mdx";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ReasoningLogsProps {
     mainReasoning: string;
@@ -12,7 +12,7 @@ interface ReasoningLogsProps {
 }
 
 export function ReasoningLogs({ mainReasoning, rewrittenThoughts, updatedAt }: ReasoningLogsProps) {
-    // @ts-ignore
+    // @ts-expect-error - TS2322: Type 'string[]' is not assignable to type 'string'.
     const uniqueTickers = [...new Set(rewrittenThoughts.map(t => t.ticker))];
     const formattedDate = new Date(updatedAt).toLocaleString('en-US', {
         month: 'short',
