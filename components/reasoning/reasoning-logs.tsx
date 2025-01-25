@@ -42,6 +42,13 @@ export function ReasoningLogs({ mainReasoning, rewrittenThoughts, updatedAt }: R
             </CardHeader>
             <CardContent>
                 <ScrollArea className="h-[500px] w-full rounded-md border p-4">
+                    <style>
+                    {`
+                    [data-radix-scroll-area-viewport] div {
+                        display:block !important;
+                    }
+                    `}
+                    </style>
                     <div className="prose dark:prose-invert max-w-none">
                         <MDXRemote source={mainReasoning} parseFrontmatter />          </div>
                 </ScrollArea>

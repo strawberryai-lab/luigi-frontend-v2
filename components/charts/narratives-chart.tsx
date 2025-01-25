@@ -38,23 +38,33 @@ export function NarrativesChart({ narratives }: NarrativeChartProps) {
     }));
 
   return (
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="p-2">
           <BarChart
             data={chartData}
             layout="vertical"
+            barGap={1}
+            barCategoryGap={1}
           >
             <YAxis
               dataKey="narrative"
               type="category"
               tickLine={false}
-              tickMargin={10}
+              tickMargin={0}
               axisLine={false}
               width={60}
-              height={30}
+              height={10}
+              spacing={2}
+              tickSize={10}
+              padding={{
+                top: 0,
+                bottom: 0
+              }}
+              minTickGap={0}
             />
             <XAxis 
               type="number" 
               tickFormatter={(value) => `${value.toFixed(0)}%`}
+              tickSize={10}
             />
             <ChartTooltip
               cursor={false}
@@ -64,6 +74,7 @@ export function NarrativesChart({ narratives }: NarrativeChartProps) {
               dataKey="rank" 
               fill="hsl(var(--berry))" 
               radius={[4, 6, 6, 4]}
+              barSize={10}
             />
           </BarChart>
         </ChartContainer>
