@@ -9,18 +9,38 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@devnomic/marquee": "^1.0.2",
+    "@mintlify/mdx": "^1.0.1",
+    "@prisma/client": "6.2.1",
+    "@radix-ui/react-label": "^2.1.1",
+    "@radix-ui/react-scroll-area": "^1.2.2",
+    "@radix-ui/react-select": "^2.1.5",
+    "@radix-ui/react-separator": "^1.1.1",
+    "@radix-ui/react-slot": "^1.1.1",
+    "@svgr/webpack": "^8.1.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "@tanstack/react-query": "^5.64.2",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "install": "^0.13.0",
+    "lucide-react": "^0.474.0",
+    "next": "14.2.16",
+    "next-themes": "^0.4.4",
     "react": "^18",
     "react-dom": "^18",
-    "next": "14.2.16"
+    "recharts": "^2.15.0",
+    "tailwind-merge": "^2.6.0",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "typescript": "^5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
     "eslint": "^8",
-    "eslint-config-next": "14.2.16"
+    "eslint-config-next": "14.2.16",
+    "postcss": "^8",
+    "prisma": "^6.2.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
   }
 }

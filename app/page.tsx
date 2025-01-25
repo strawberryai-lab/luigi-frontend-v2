@@ -1,101 +1,172 @@
-import Image from "next/image";
+import { StatsCard } from "@/components/stats/stats-card";
+import { Header } from "@/components/layout/header";
+import prisma from "@/lib/prisma";
+import { Separator } from "@/components/ui/separator";
+import { SlidingTickers } from "@/components/tickers/sliding-tickers";
+import { NarrativesChart } from "@/components/charts/narratives-chart";
+import { ReasoningLogs } from "@/components/reasoning/reasoning-logs";
 
-export default function Home() {
+const formatter = new Intl.NumberFormat('en', { notation: 'compact' });
+
+interface TickerData {
+  ticker: string;
+  rank: number;
+  rank_hourly_pct_change: number;
+  sentimentScore: number;
+  mentionsScore: number;
+  mentionsAcceleration: number;
+  sentimentAcceleration: number;
+}
+
+interface NarrativeData {
+  narrative: string;
+  historicalRank: {
+    datetime: string;
+    rank: number;
+  }[];
+  "24h_change_pct": number;
+}
+
+// Add this interface with the other interfaces
+interface LastJobData {
+  _id: string;
+  status: string;
+  webhook: null;
+  createdAt: string;
+  updatedAt: string;
+  result: {
+    mainReasoning: string;
+    rewrittenThoughts: {
+      thought: string;
+      ticker: string;
+    }[]
+  };
+}
+
+export default async function Home() {
+  const postsCount = await prisma.twitter_posts.count({
+    where: {
+      created_at: {
+        gte: new Date('2025-01-01')
+      }
+    }
+  });
+
+  const narrativesResponse = await fetch('https://luigi-bigdata.usestrawberry.ai/narratives', {
+    next: { revalidate: 3600 }
+  });
+  const narratives = await narrativesResponse.json();
+  const narrativesCount = narratives.length;
+
+  // Get the earliest job and total thoughts count
+  const firstJob = await prisma.jobs_v3.findFirst({
+    orderBy: {
+      createdAt: 'asc'
+    }
+  });
+
+  const allJobs = await prisma.jobs_v3.findMany({
+    select: {
+      result: true
+    }
+  });
+
+  // Calculate total thoughts by summing up the thoughts array length from each job
+  const totalThoughts = allJobs.reduce((sum, job) => {
+    return sum + (job.result?.thoughts?.length || 0);
+  }, 0);
+
+  const formattedCount = formatter.format(postsCount);
+  const formattedNarrativesCount = formatter.format(narrativesCount);
+  const formattedThoughtsCount = formatter.format(totalThoughts);
+
+  const sinceDate = firstJob ? firstJob.createdAt.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }) : 'N/A';
+
+  const tickersResponse = await fetch('https://luigi-bigdata.usestrawberry.ai/tickers?hours=18&limit=100', {
+    next: { revalidate: 300 } // Revalidate every 5 minutes
+  });
+  const tickers: TickerData[] = await tickersResponse.json();
+
+  const lastJobResponse = await fetch('https://luigi-reasoning.usestrawberry.ai/last_job', {
+    next: { revalidate: 300 } // Revalidate every 5 minutes
+  });
+  const lastJob: LastJobData = await lastJobResponse.json();
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <main>
+      <Header />
+      <div className="pt-24 px-6">
+        <div className="container mx-auto">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 items-center justify-center gap-4 w-full">
+            <StatsCard title="Posts scraped" description="Since 01/01/25">
+              <h1 className="text-2xl">{formattedCount}</h1>
+            </StatsCard>
+            <StatsCard title="Analyzed narratives" description="Last 24 hours">
+              <h1 className="text-2xl">{formattedNarrativesCount}</h1>
+            </StatsCard>
+            <StatsCard title="Thoughts Generated" description={`Since ${sinceDate}`}>
+              <h1 className="text-2xl">{formattedThoughtsCount}</h1>
+            </StatsCard>
+            <StatsCard title="Monitored Tickers" description={`In Watchlist`}>
+              <h1 className="text-2xl">{formatter.format(tickers.length)}</h1>
+            </StatsCard>
+          </div>
+          <Separator className="mt-6 mb-6" />
+          <div className="">
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl">Watchlist</h2>
+                <p className="text-muted-foreground">Tickers monitored by Luigi in Real-Time</p>
+                <SlidingTickers>
+                  {tickers.map((ticker) => (
+                    <div key={ticker.ticker} className="px-4">
+                      <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
+                        ${ticker.ticker}
+                      </code>
+                    </div>
+                  ))}
+                </SlidingTickers>
+              </div>
+              <Separator />
+              <div>
+                <h2 className="text-2xl">Narratives</h2>
+                <p className="text-muted-foreground">Mindshare of narratives tracked by Luigi across social medias</p>
+                <SlidingTickers>
+                  {narratives.map((narrative: NarrativeData) => (
+                    <div key={narrative.narrative} className="px-4 flex items-center gap-2">
+                      <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
+                        {narrative.narrative}
+                      </code>
+                      <span className={`text-xs font-medium ${
+                        narrative['24h_change_pct'] > 0 
+                          ? 'text-green-500' 
+                          : 'text-red-500'
+                      }`}>
+                        {narrative['24h_change_pct'] > 0 ? '↑' : '↓'}
+                        {Math.abs(narrative['24h_change_pct']).toFixed(2)}%
+                      </span>
+                    </div>
+                  ))}
+                </SlidingTickers>
+                <NarrativesChart narratives={narratives} />
+              </div>
+            </div>
+          </div>
+          <Separator className="mt-6 mb-6" />
+          <div>
+            <ReasoningLogs 
+              mainReasoning={lastJob.result.mainReasoning}
+              rewrittenThoughts={lastJob.result.rewrittenThoughts}
+              updatedAt={lastJob.updatedAt}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
+          <Separator className="mt-6 mb-6" />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      </div>
+    </main>
   );
 }

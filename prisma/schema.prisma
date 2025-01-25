@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+
+model twitter_posts {
+  id          String                @id @default(auto()) @map("_id") @db.ObjectId
+  created_at  DateTime              @db.Date
+  fullText    String
+  id_         String                @map("id")
+  @@index([created_at], map: "created_at_1")
+  @@index([id], map: "id_1")
+}
+
+model jobs_v3 {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt DateTime     @db.Date
+  result    JobsV3Result
+  status    String
+  updatedAt DateTime     @db.Date
+  /// Could not determine type: the field only had null or empty values in the sample set.
+  webhook   Json?
+}
+
+type JobsV3Result {
+  finalReasoning    String
+  mainReasoning     String
+  posts             String[]
+  reason            JobsV3ResultReason[]
+  rewrittenThoughts JobsV3ResultRewrittenThoughts[]
+  thoughts          JobsV3ResultThoughts[]
+  topPicks          JobsV3ResultTopPicks[]
+  topPicksMetadata  JobsV3ResultTopPicksMetadata[]
+}
+
+type JobsV3ResultReason {
+  reason String
+  ticker String
+}
+
+
+type JobsV3ResultRewrittenThoughts {
+  thought String
+  ticker  String
+}
+
+
+type JobsV3ResultThoughts {
+  thought String
+  ticker  String
+}
+
+
+type JobsV3ResultTopPicks {
+  mentionsAcceleration   Float
+  /// Multiple data types found: Float: 6%, Int: 94% out of 50 sampled entries
+  mentionsScore          Json
+  rank                   Float
+  rank_hourly_pct_change Float
+  /// Multiple data types found: Float: 58%, Int: 42% out of 50 sampled entries
+  sentimentAcceleration  Json
+  /// Multiple data types found: Float: 22%, Int: 78% out of 50 sampled entries
+  sentimentScore         Json
+  ticker                 String
+  trend                  JobsV3ResultTopPicksTrend[]
+}
+
+
+type JobsV3ResultTopPicksMetadata {
+  metadata JobsV3ResultTopPicksMetadataMetadata
+  ticker   String
+}
+
+type JobsV3ResultTopPicksMetadataMetadata {
+  buy_now_score             Int
+  can_it_moon               Boolean
+  confident_on_next_24hours Int
+  is_low_market_cap_token   Boolean
+  long_term_bullish         Boolean
+  reasons                   String[]
+}
+
+type JobsV3ResultTopPicksTrend {
+  hourlyTimeFrame       String
+  mentionsAcceleration  Float
+  /// Multiple data types found: Float: 8.7%, Int: 91.3% out of 550 sampled entries
+  mentionsScore         Json
+  /// Multiple data types found: Float: 58%, Int: 42% out of 550 sampled entries
+  sentimentAcceleration Json
+  /// Multiple data types found: Float: 21.6%, Int: 78.4% out of 550 sampled entries
+  sentimentScore        Json
+  smoothedMindshare     Float
+}
