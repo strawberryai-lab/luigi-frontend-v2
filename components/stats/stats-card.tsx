@@ -1,4 +1,6 @@
+"use client"
 import * as React from "react"
+import CountUp from 'react-countup'
 import {
   Card,
   CardContent,
@@ -10,19 +12,36 @@ import {
 interface StatsCardProps {
   title: string
   description: string
-  children: React.ReactNode,
+  children?: React.ReactNode
+  value?: number
   className?: string
+  icon?: React.ReactNode
 }
 
-export function StatsCard({ title, description, children, className }: StatsCardProps) {
+export function StatsCard({ title, description, children, value, className, icon }: StatsCardProps) {
   return (
     <Card className={className}>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <div className="flex items-center gap-2">
+          {icon && <div className="text-muted-foreground">{icon}</div>}
+          <CardTitle>{title}</CardTitle>
+        </div>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        {children}
+        {value !== undefined ? (
+          <h1 className="text-2xl">
+            <CountUp
+              end={value}
+              duration={2}
+              separator=","
+              decimal="."
+              decimals={0}
+            />
+          </h1>
+        ) : (
+          children
+        )}
       </CardContent>
     </Card>
   )
