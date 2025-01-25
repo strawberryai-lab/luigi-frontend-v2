@@ -8,6 +8,12 @@ datasource db {
 }
 
 
+model twitter_sentiment {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  tweetId    String
+  narratives Narrative[]
+}
+
 model twitter_posts {
   id          String                @id @default(auto()) @map("_id") @db.ObjectId
   created_at  DateTime              @db.Date
@@ -95,4 +101,17 @@ type JobsV3ResultTopPicksTrend {
   /// Multiple data types found: Float: 21.6%, Int: 78.4% out of 550 sampled entries
   sentimentScore        Json
   smoothedMindshare     Float
+}
+
+
+
+type Narrative {
+  name           String
+  sentiment      String
+  detectedTickers DetectedTicker[]
+}
+
+type DetectedTicker {
+  ticker    String
+  sentiment String
 }

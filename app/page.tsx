@@ -5,6 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { SlidingTickers } from "@/components/tickers/sliding-tickers";
 import { NarrativesChart } from "@/components/charts/narratives-chart";
 import { ReasoningLogs } from "@/components/reasoning/reasoning-logs";
+import { countAllTickers } from "./utils/queries";
 
 const formatter = new Intl.NumberFormat('en', { notation: 'compact' });
 
@@ -65,6 +66,8 @@ export default async function Home() {
     }
   });
 
+  const numberOfTickers = await countAllTickers();
+
   const allJobs = await prisma.jobs_v3.findMany({
     select: {
       result: true
@@ -105,14 +108,14 @@ export default async function Home() {
             <StatsCard title="Posts scraped" description="Since 01/01/25">
               <h1 className="text-2xl">{formattedCount}</h1>
             </StatsCard>
-            <StatsCard title="Analyzed narratives" description="Last 24 hours">
+            <StatsCard title="Analyzed Narratives" description="Last 24 hours">
               <h1 className="text-2xl">{formattedNarrativesCount}</h1>
             </StatsCard>
             <StatsCard title="Thoughts Generated" description={`Since ${sinceDate}`}>
               <h1 className="text-2xl">{formattedThoughtsCount}</h1>
             </StatsCard>
-            <StatsCard title="Monitored Tickers" description={`In Watchlist`}>
-              <h1 className="text-2xl">{formatter.format(tickers.length)}</h1>
+            <StatsCard title="Analyzed Tickers" description={`Since inception`}>
+              <h1 className="text-2xl">{formatter.format(numberOfTickers)}</h1>
             </StatsCard>
           </div>
           <Separator className="mt-6 mb-6" />
