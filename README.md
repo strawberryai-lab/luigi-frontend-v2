@@ -1,36 +1,135 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Luigi Frontend V2 API Documentation
 
-## Getting Started
+## Reasoning Endpoints
 
-First, run the development server:
+### Get Job by ID
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```http
+GET /api/reasoning/:id
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Fetches a specific job by its ID.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**Response**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `200 OK`: Returns the complete job object
+- `404 Not Found`: If job doesn't exist
+- `500 Internal Server Error`: If there's a server error
 
-## Learn More
+### Get Jobs Count
 
-To learn more about Next.js, take a look at the following resources:
+```http
+GET /api/reasoning/count
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Returns the total count of completed jobs.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Response**
 
-## Deploy on Vercel
+```json
+{
+  "count": number
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `200 OK`: Returns the count object
+- `500 Internal Server Error`: If there's a server error
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Get Job Pagination
+
+```http
+GET /api/reasoning/:id/pagination
+```
+
+Fetches the current job along with references to the next and previous jobs (by creation date).
+
+**Response**
+
+```json
+{
+  "current": JobObject,
+  "prev": {
+    "id": string,
+    "createdAt": Date
+  } | null,
+  "next": {
+    "id": string,
+    "createdAt": Date
+  } | null
+}
+```
+
+- `200 OK`: Returns the pagination object
+- `404 Not Found`: If current job doesn't exist
+- `500 Internal Server Error`: If there's a server error
+
+### Get Last Completed Job
+
+```http
+GET /api/reasoning/last
+```
+
+Fetches the most recent completed job.
+
+**Response**
+
+- `200 OK`: Returns the complete job object
+- `404 Not Found`: If no completed jobs exist
+- `500 Internal Server Error`: If there's a server error
+
+## Job Object Structure
+
+```typescript
+{
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  status: string;
+  result: {
+    finalReasoning?: string;
+    mainReasoning?: string;
+    posts: string[];
+    reason: {
+      reason?: string;
+      ticker?: string;
+    }[];
+    rewrittenThoughts: {
+      thought?: string;
+      ticker?: string;
+    }[];
+    thoughts: {
+      thought?: string;
+      ticker?: string;
+    }[];
+    topPicks: {
+      mentionsAcceleration?: number;
+      mentionsScore?: number | float;
+      rank?: number;
+      rank_hourly_pct_change?: number;
+      sentimentAcceleration?: number | float;
+      sentimentScore?: number | float;
+      ticker?: string;
+      trend: {
+        hourlyTimeFrame?: string;
+        mentionsAcceleration?: number;
+        mentionsScore?: number | float;
+        sentimentAcceleration?: number | float;
+        sentimentScore?: number | float;
+        smoothedMindshare?: number;
+      }[];
+    }[];
+    topPicksMetadata: {
+      ticker?: string;
+      metadata?: {
+        buy_now_score?: number;
+        can_it_moon?: boolean;
+        confident_on_next_24hours?: number;
+        is_low_market_cap_token?: boolean;
+        long_term_bullish?: boolean;
+        reasons?: string[];
+      };
+    }[];
+  };
+  webhook?: any;
+}
+```

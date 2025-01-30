@@ -3,8 +3,7 @@ import { Header } from "@/components/layout/header";
 import { Separator } from "@/components/ui/separator";
 import { SlidingTickers } from "@/components/tickers/sliding-tickers";
 import { NarrativesChart } from "@/components/charts/narratives-chart";
-import { ReasoningLogs } from "@/components/reasoning/reasoning-logs";
-import { Toast } from "radix-ui"
+import { ReasoningBlock } from "@/components/reasoning/reasoning-block";
 import {
   getPostsCount,
   getNarratives,
@@ -12,9 +11,13 @@ import {
   getAllJobsThoughts,
   countAllTickers,
   getTickers,
-  getLastJob
 } from "./utils/queries";
-import { ChartNoAxesColumnIncreasing, FileChartPie, Flame, Sparkle, Sparkles } from "lucide-react";
+import {
+  ChartNoAxesColumnIncreasing,
+  FileChartPie,
+  Flame,
+  Sparkles,
+} from "lucide-react";
 import CookieConsent from "@/components/ui/cookie-consent";
 
 export default async function Home() {
@@ -25,7 +28,6 @@ export default async function Home() {
     totalThoughts,
     numberOfTickers,
     tickers,
-    lastJob
   ] = await Promise.all([
     getPostsCount(),
     getNarratives(),
@@ -33,15 +35,16 @@ export default async function Home() {
     getAllJobsThoughts(),
     countAllTickers(),
     getTickers(),
-    getLastJob()
   ]);
 
   const narrativesCount = narratives.length;
-  const sinceDate = firstJob ? firstJob.createdAt.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric'
-  }) : 'N/A';
+  const sinceDate = firstJob
+    ? firstJob.createdAt.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "N/A";
 
   return (
     <main>
@@ -79,7 +82,9 @@ export default async function Home() {
             <div className="space-y-6">
               <div>
                 <h2 className="text-2xl">Watchlist</h2>
-                <p className="text-muted-foreground">Tickers monitored by Luigi in Real-Time</p>
+                <p className="text-muted-foreground">
+                  Tickers monitored by Luigi in Real-Time
+                </p>
                 <SlidingTickers>
                   {/** @ts-ignore */}
                   {tickers.map((ticker) => (
@@ -94,19 +99,27 @@ export default async function Home() {
               <Separator />
               <div>
                 <h2 className="text-2xl">Narratives</h2>
-                <p className="text-muted-foreground">Mindshare of narratives tracked by Luigi across social medias</p>
+                <p className="text-muted-foreground">
+                  Mindshare of narratives tracked by Luigi across social medias
+                </p>
                 <SlidingTickers>
                   {narratives.map((narrative: any) => (
-                    <div key={narrative.narrative} className="px-4 flex items-center gap-2">
+                    <div
+                      key={narrative.narrative}
+                      className="px-4 flex items-center gap-2"
+                    >
                       <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm">
                         {narrative.narrative}
                       </code>
-                      <span className={`text-xs font-medium ${narrative['24h_change_pct'] > 0
-                          ? 'text-green-500'
-                          : 'text-red-500'
-                        }`}>
-                        {narrative['24h_change_pct'] > 0 ? '↑' : '↓'}
-                        {Math.abs(narrative['24h_change_pct']).toFixed(2)}%
+                      <span
+                        className={`text-xs font-medium ${
+                          narrative["24h_change_pct"] > 0
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }`}
+                      >
+                        {narrative["24h_change_pct"] > 0 ? "↑" : "↓"}
+                        {Math.abs(narrative["24h_change_pct"]).toFixed(2)}%
                       </span>
                     </div>
                   ))}
@@ -117,11 +130,7 @@ export default async function Home() {
           </div>
           <Separator className="mt-6 mb-6" />
           <div>
-            <ReasoningLogs
-              mainReasoning={lastJob.result.mainReasoning}
-              rewrittenThoughts={lastJob.result.rewrittenThoughts}
-              updatedAt={lastJob.updatedAt}
-            />
+            <ReasoningBlock />
           </div>
           <Separator className="mt-6 mb-6" />
         </div>

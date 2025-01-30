@@ -1,7 +1,10 @@
+"use client";
+
 import { remark } from "remark";
 import html from "remark-html";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useMemo } from "react";
 
 interface ReasoningLogsProps {
   mainReasoning: string;
@@ -12,14 +15,15 @@ interface ReasoningLogsProps {
   updatedAt: string;
 }
 
-export async function ReasoningLogs({
+export function ReasoningLogs({
   mainReasoning,
   rewrittenThoughts,
   updatedAt,
 }: ReasoningLogsProps) {
-  // Use remark to convert markdown into HTML string
-  const processedContent = await remark().use(html).process(mainReasoning);
-  const contentHtml = processedContent.toString();
+  // Process markdown synchronously using useMemo
+  const contentHtml = useMemo(() => {
+    return remark().use(html).processSync(mainReasoning).toString();
+  }, [mainReasoning]);
 
   // @ts-expect-error - TS2322: Type 'string[]' is not assignable to type 'string'.
   const uniqueTickers = [...new Set(rewrittenThoughts.map((t) => t.ticker))];
@@ -56,10 +60,10 @@ export async function ReasoningLogs({
         <ScrollArea className="h-[500px] w-full rounded-md border p-4">
           <style>
             {`
-                    [data-radix-scroll-area-viewport] div {
-                        display:block !important;
-                    }
-                    `}
+              [data-radix-scroll-area-viewport] div {
+                display:block !important;
+              }
+            `}
           </style>
           <div className="prose dark:prose-invert max-w-none">
             <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
