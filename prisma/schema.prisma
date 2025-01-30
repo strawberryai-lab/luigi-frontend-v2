@@ -34,8 +34,8 @@ model jobs_v3 {
 }
 
 type JobsV3Result {
-  finalReasoning    String
-  mainReasoning     String
+  finalReasoning    String?
+  mainReasoning     String?
   posts             String[]
   reason            JobsV3ResultReason[]
   rewrittenThoughts JobsV3ResultRewrittenThoughts[]
@@ -45,73 +45,73 @@ type JobsV3Result {
 }
 
 type JobsV3ResultReason {
-  reason String
-  ticker String
+  reason String?
+  ticker String?
 }
 
 
 type JobsV3ResultRewrittenThoughts {
-  thought String
-  ticker  String
+  thought String?
+  ticker  String?
 }
 
 
 type JobsV3ResultThoughts {
-  thought String
-  ticker  String
+  thought String?
+  ticker  String?
 }
 
 
 type JobsV3ResultTopPicks {
-  mentionsAcceleration   Float
+  mentionsAcceleration   Float?
   /// Multiple data types found: Float: 6%, Int: 94% out of 50 sampled entries
-  mentionsScore          Json
-  rank                   Float
-  rank_hourly_pct_change Float
+  mentionsScore          Json?
+  rank                   Float?
+  rank_hourly_pct_change Float?
   /// Multiple data types found: Float: 58%, Int: 42% out of 50 sampled entries
-  sentimentAcceleration  Json
+  sentimentAcceleration  Json?
   /// Multiple data types found: Float: 22%, Int: 78% out of 50 sampled entries
-  sentimentScore         Json
-  ticker                 String
+  sentimentScore         Json?
+  ticker                 String?
   trend                  JobsV3ResultTopPicksTrend[]
 }
 
 
 type JobsV3ResultTopPicksMetadata {
-  metadata JobsV3ResultTopPicksMetadataMetadata
-  ticker   String
+  metadata JobsV3ResultTopPicksMetadataMetadata?
+  ticker   String?
 }
 
 type JobsV3ResultTopPicksMetadataMetadata {
-  buy_now_score             Int
-  can_it_moon               Boolean
-  confident_on_next_24hours Int
-  is_low_market_cap_token   Boolean
-  long_term_bullish         Boolean
+  buy_now_score             Int?
+  can_it_moon               Boolean?
+  confident_on_next_24hours Int?
+  is_low_market_cap_token   Boolean?
+  long_term_bullish         Boolean?
   reasons                   String[]
 }
 
 type JobsV3ResultTopPicksTrend {
-  hourlyTimeFrame       String
-  mentionsAcceleration  Float
+  hourlyTimeFrame       String?
+  mentionsAcceleration  Float?
   /// Multiple data types found: Float: 8.7%, Int: 91.3% out of 550 sampled entries
-  mentionsScore         Json
+  mentionsScore         Json?
   /// Multiple data types found: Float: 58%, Int: 42% out of 550 sampled entries
-  sentimentAcceleration Json
+  sentimentAcceleration Json?
   /// Multiple data types found: Float: 21.6%, Int: 78.4% out of 550 sampled entries
-  sentimentScore        Json
-  smoothedMindshare     Float
+  sentimentScore        Json?
+  smoothedMindshare     Float?
 }
 
 
 
 type Narrative {
-  name           String
-  sentiment      String
+  name           String?
+  sentiment      String?
   detectedTickers DetectedTicker[]
 }
 
 type DetectedTicker {
-  ticker    String
-  sentiment String
+  ticker    String?
+  sentiment String?
 }

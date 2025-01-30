@@ -48,13 +48,22 @@ export async function getFirstJob() {
 
 export async function getAllJobsThoughts() {
   const allJobs = await prisma.jobs_v3.findMany({
+    where: {
+      status: "completed",
+    },
     select: {
       result: true,
     },
   });
 
   return allJobs.reduce((sum: number, job) => {
-    return sum + (job.result?.thoughts?.length || 0);
+    const thoughtsLength =
+      job.result &&
+      typeof job.result === "object" &&
+      Array.isArray(job.result.thoughts)
+        ? job.result.thoughts.length
+        : 0;
+    return sum + thoughtsLength;
   }, 0);
 }
 
