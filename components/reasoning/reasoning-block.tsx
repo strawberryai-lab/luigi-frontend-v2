@@ -37,7 +37,9 @@ interface PaginationData {
 }
 
 async function fetchLastJob() {
-  const response = await fetch("/api/reasoning/last");
+  const response = await fetch("/api/reasoning/last", {
+    cache: "no-store",
+  });
   if (!response.ok) throw new Error("Failed to fetch last job");
   const data = await response.json();
   if (!data?.result?.mainReasoning || !data?.result?.rewrittenThoughts) {
@@ -47,7 +49,9 @@ async function fetchLastJob() {
 }
 
 async function fetchJobWithPagination(jobId: string) {
-  const response = await fetch(`/api/reasoning/${jobId}/pagination`);
+  const response = await fetch(`/api/reasoning/${jobId}/pagination`, {
+    cache: "no-store",
+  });
   if (!response.ok) throw new Error("Failed to fetch job");
   const data = await response.json();
   if (
